@@ -45,6 +45,24 @@ jobs:
           file: ./githubActionTest/Dockerfile
           push: true
           tags: snaphoo/sitetestaction:latest
-      
+
+
+  deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - 
+        name: clean container
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            docker rm -f sitetestaction
+            docker pull snaphoo/sitetestaction:latest
+            docker rmi $(docker images -q --filter "dangling=true")
+            docker run --name sitetestaction -d -p 5051:80 snaphoo/sitetestaction:latest
       
     
